@@ -1,0 +1,11 @@
+.claude
+
+server/dist/*
+server/.env
+
+app/android/*
+app/ios/*
+app/build/*
+
+desigin/
+docs/

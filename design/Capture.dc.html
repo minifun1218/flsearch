@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+  <style>
+    body { margin: 0; background: #FBFAF7; color: #23201C;
+      font-family: "Noto Sans SC", system-ui, -apple-system, sans-serif;
+      font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #4A6B4F; text-decoration: none; } a:hover { color: #3A553D; }
+    .n { font-family: Archivo, system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  </style>
+</helmet>
+
+<div style="display: flex; gap: 30px; padding: 0;">
+
+  <!-- 屏 1：取景 -->
+  <div style="width: 390px; height: 844px; background: #191713; position: relative; overflow: hidden;">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 58px 20px 0 20px;">
+      <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: rgba(255,255,255,0.10);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F2EC" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </div>
+      <span style="color: rgba(245,242,236,0.85); font-size: 14px; font-weight: 500;">拍照记录</span>
+      <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: rgba(255,255,255,0.10);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F2EC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4.5 13H11l-1 9 8.5-11H12l1-9z"></path></svg>
+      </div>
+    </div>
+
+    <!-- 取景框 -->
+    <div style="margin: 44px 30px 0 30px; height: 330px; position: relative; background: #24211C; border-radius: 6px;">
+      <!-- 盘中餐示意 -->
+      <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+        <svg width="186" height="186" viewBox="0 0 200 200" fill="none" stroke="rgba(245,242,236,0.20)" stroke-width="2">
+          <circle cx="100" cy="104" r="76"></circle>
+          <circle cx="100" cy="104" r="62"></circle>
+          <path d="M70 96c0-10 9-18 20-18s20 8 20 18-9 18-20 18-20-8-20-18z"></path>
+          <path d="M116 118c6-8 16-10 22-5"></path>
+          <path d="M74 126c8-5 18-4 24 2"></path>
+        </svg>
+      </div>
+      <!-- 四角 -->
+      <div style="position: absolute; top: -1px; left: -1px; width: 30px; height: 30px; border-top: 2.5px solid #F5F2EC; border-left: 2.5px solid #F5F2EC; border-radius: 6px 0 0 0;"></div>
+      <div style="position: absolute; top: -1px; right: -1px; width: 30px; height: 30px; border-top: 2.5px solid #F5F2EC; border-right: 2.5px solid #F5F2EC; border-radius: 0 6px 0 0;"></div>
+      <div style="position: absolute; bottom: -1px; left: -1px; width: 30px; height: 30px; border-bottom: 2.5px solid #F5F2EC; border-left: 2.5px solid #F5F2EC; border-radius: 0 0 0 6px;"></div>
+      <div style="position: absolute; bottom: -1px; right: -1px; width: 30px; height: 30px; border-bottom: 2.5px solid #F5F2EC; border-right: 2.5px solid #F5F2EC; border-radius: 0 0 6px 0;"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 26px; padding: 0 44px;">
+      <div style="color: rgba(245,242,236,0.92); font-size: 14px;">将整餐放进取景框</div>
+      <div style="color: rgba(245,242,236,0.45); font-size: 12px; margin-top: 6px; line-height: 1.6;">俯拍、光线充足时识别更准；<br>餐具可作为份量参照</div>
+    </div>
+
+    <!-- 餐次选择 -->
+    <div style="display: flex; gap: 8px; justify-content: center; margin-top: 30px;">
+      <div style="padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,0.10); color: rgba(245,242,236,0.6); font-size: 13px;">早餐</div>
+      <div style="padding: 8px 16px; border-radius: 999px; background: #F5F2EC; color: #191713; font-size: 13px; font-weight: 500;">午餐</div>
+      <div style="padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,0.10); color: rgba(245,242,236,0.6); font-size: 13px;">晚餐</div>
+      <div style="padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,0.10); color: rgba(245,242,236,0.6); font-size: 13px;">加餐</div>
+    </div>
+
+    <!-- 快门区 -->
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 36px 46px 36px;">
+      <div style="width: 52px; height: 52px; border-radius: 14px; background: #2E2A24; border: 1px solid rgba(245,242,236,0.16); display: flex; align-items: center; justify-content: center;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#F5F2EC" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 15l5-4 4 3 3-2 6 4"></path></svg>
+      </div>
+      <div style="width: 76px; height: 76px; border-radius: 50%; border: 3px solid rgba(245,242,236,0.9); display: flex; align-items: center; justify-content: center;">
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: #F5F2EC;"></div>
+      </div>
+      <div style="width: 52px; height: 52px; border-radius: 14px; background: #2E2A24; border: 1px solid rgba(245,242,236,0.16); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F2EC" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+        <span style="color: rgba(245,242,236,0.6); font-size: 8px;">手动</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 屏 2：识别中 -->
+  <div style="width: 390px; height: 844px; background: #191713; position: relative; overflow: hidden;">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 58px 20px 0 20px;">
+      <div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: rgba(255,255,255,0.10);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F2EC" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </div>
+      <span style="color: rgba(245,242,236,0.85); font-size: 14px; font-weight: 500;">正在识别</span>
+      <div style="width: 40px;"></div>
+    </div>
+
+    <div style="margin: 44px 30px 0 30px; height: 330px; position: relative; background: #24211C; border-radius: 6px; overflow: hidden;">
+      <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.5;">
+        <svg width="186" height="186" viewBox="0 0 200 200" fill="none" stroke="rgba(245,242,236,0.20)" stroke-width="2">
+          <circle cx="100" cy="104" r="76"></circle>
+          <circle cx="100" cy="104" r="62"></circle>
+          <path d="M70 96c0-10 9-18 20-18s20 8 20 18-9 18-20 18-20-8-20-18z"></path>
+          <path d="M116 118c6-8 16-10 22-5"></path>
+          <path d="M74 126c8-5 18-4 24 2"></path>
+        </svg>
+      </div>
+      <div style="position: absolute; left: 0; right: 0; top: 168px; height: 2px; background: linear-gradient(90deg, rgba(122,160,128,0) 0%, #7AA080 50%, rgba(122,160,128,0) 100%);"></div>
+      <div style="position: absolute; left: 0; right: 0; top: 168px; height: 74px; background: linear-gradient(180deg, rgba(122,160,128,0.16) 0%, rgba(122,160,128,0) 100%);"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <div style="color: rgba(245,242,236,0.92); font-size: 15px; font-weight: 500;">正在分析这一餐…</div>
+      <div class="n" style="color: rgba(245,242,236,0.45); font-size: 12px; margin-top: 7px;">通常需要 5–8 秒</div>
+    </div>
+
+    <!-- 已识别条目流式出现 -->
+    <div style="margin: 28px 30px 0 30px; display: flex; flex-direction: column; gap: 9px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.07); border-radius: 12px; padding: 13px 15px;">
+        <div style="display: flex; align-items: center; gap: 9px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7AA080" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+          <span style="color: #F5F2EC; font-size: 14px;">杂粮饭</span>
+        </div>
+        <span class="n" style="color: rgba(245,242,236,0.5); font-size: 12px;">约 150 g</span>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.07); border-radius: 12px; padding: 13px 15px;">
+        <div style="display: flex; align-items: center; gap: 9px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7AA080" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+          <span style="color: #F5F2EC; font-size: 14px;">香煎鸡胸肉</span>
+        </div>
+        <span class="n" style="color: rgba(245,242,236,0.5); font-size: 12px;">约 120 g</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.04); border-radius: 12px; padding: 13px 15px;">
+        <div style="width: 15px; height: 15px; border-radius: 50%; border: 2px solid rgba(245,242,236,0.22); border-top-color: rgba(245,242,236,0.6);"></div>
+        <div style="height: 9px; width: 96px; border-radius: 5px; background: rgba(245,242,236,0.13);"></div>
+      </div>
+    </div>
+
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 0 30px 46px 30px;">
+      <div style="height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 14px; border: 1px solid rgba(245,242,236,0.18); color: rgba(245,242,236,0.7); font-size: 14px;">取消</div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

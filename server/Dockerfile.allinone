@@ -1,0 +1,46 @@
+# FitMeal 单容器镜像：Postgres + API 一起打包，适合「给别人一个容器就能跑」的场景。
+#
+# 跟仓库根目录 docker-compose.yml 那套（db / migrate / api 三个容器）是两回事，
+# 那套数据库和应用分开、更适合长期部署；这个是“打包分发”场景专用，见
+# docs/04-deployment.md。数据库文件必须挂卷（/var/lib/postgresql/data），
+# 不挂卷的话容器一删数据就没了。
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+# postgresql：数据库本体；supervisor：容器里管两个常驻进程；
+# 其余是 initdb/psql/pg_isready 需要的东西（postgresql 包自带 client）。
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends postgresql supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+RUN chmod +x docker/postgres-entrypoint.sh docker/api-entrypoint.sh \
+    && mkdir -p /data/photos /var/lib/postgresql/data \
+    && chown -R postgres:postgres /var/lib/postgresql/data
+
+# DATABASE_URL 不在这里写死——api-entrypoint.sh 启动时从下面这三个 POSTGRES_*
+# 现算，保证改密码不会两边对不上（见该脚本注释）。
+ENV STORAGE_DIR=/data/photos \
+    PGDATA=/var/lib/postgresql/data \
+    APP_ENV=production \
+    POSTGRES_USER=fitmeal \
+    POSTGRES_PASSWORD=fitmeal \
+    POSTGRES_DB=fitmeal \
+    SECRET_KEY=please-change-this-secret-key \
+    RECOGNIZER_PROVIDER=mock
+
+# 数据库文件、照片都在这两个目录，不挂卷就是「容器一删全没了」。
+VOLUME ["/var/lib/postgresql/data", "/data/photos"]
+
+EXPOSE 8000
+
+CMD ["supervisord", "-c", "/app/docker/supervisord.conf"]

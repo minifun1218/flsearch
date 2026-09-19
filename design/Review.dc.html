@@ -1,0 +1,235 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+  <style>
+    body { margin: 0; background: #FBFAF7; color: #23201C;
+      font-family: "Noto Sans SC", system-ui, -apple-system, sans-serif;
+      font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #4A6B4F; text-decoration: none; } a:hover { color: #3A553D; }
+    .n { font-family: Archivo, system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+    .tap { cursor: pointer; user-select: none;
+      transition: background-color .16s ease, color .16s ease, border-color .16s ease, opacity .16s ease, transform .09s ease; }
+    .tap:active { transform: scale(0.96); }
+    .card { transition: border-color .2s ease, box-shadow .2s ease; }
+    .val { transition: color .18s ease; }
+  </style>
+</helmet>
+
+<div style="width: 390px; padding: 52px 0 0 0; box-sizing: border-box;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px 20px 20px;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#23201C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    <span style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em;">确认这一餐</span>
+    <span class="tap" style="font-size: 14px; color: #6B655C;">重拍</span>
+  </div>
+
+  <div style="margin: 0 20px; display: flex; gap: 14px; align-items: center;">
+    <div style="width: 78px; height: 78px; border-radius: 14px; background: #ECE7DE; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <svg width="34" height="34" viewBox="0 0 200 200" fill="none" stroke="#B5AB9C" stroke-width="7">
+        <circle cx="100" cy="100" r="76"></circle>
+        <circle cx="100" cy="100" r="58"></circle>
+      </svg>
+    </div>
+    <div>
+      <div style="font-size: 15px; font-weight: 500;">识别到 {{countText}}</div>
+      <div style="font-size: 12px; color: #9A948A; margin-top: 4px; line-height: 1.55;">份量由 AI 估算，与实际可能有出入——<br>请核对后再保存。</div>
+    </div>
+  </div>
+
+  <div style="margin: 22px 20px 0 20px; display: flex; flex-direction: column; gap: 10px;">
+
+    <sc-for list="{{items}}" as="item" hint-placeholder-count="3">
+      <div class="card" style="{{item.cardStyle}}">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+          <div style="flex-grow: 1;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 15px; font-weight: 500;">{{item.name}}</span>
+              <sc-if value="{{item.hasTag}}" hint-placeholder-val="{{true}}">
+                <span style="padding: 2px 7px; border-radius: 6px; background: #FBF2E8; color: #A8763E; font-size: 10px; font-weight: 500;">份量待确认</span>
+              </sc-if>
+            </div>
+            <div class="n" style="font-size: 12px; color: #9A948A; margin-top: 3px;">{{item.per100}}</div>
+          </div>
+          <div class="tap" onClick="{{item.del}}" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 9px; flex-shrink: 0; margin: -4px -6px 0 0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B5AB9C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"></path><path d="M9 7V5h6v2"></path><path d="M7 7l1 12h8l1-12"></path></svg>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px;">
+          <div style="{{item.stepperStyle}}">
+            <div class="tap" onClick="{{item.dec}}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-right: 1px solid #E6E2DA;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3A3630" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"></path></svg>
+            </div>
+            <div class="n" style="width: 74px; height: 44px; display: flex; align-items: center; justify-content: center; gap: 3px; font-size: 15px; font-weight: 600;">{{item.g}}<span style="font-size: 12px; font-weight: 400; color: #9A948A;">g</span></div>
+            <div class="tap" onClick="{{item.inc}}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-left: 1px solid #E6E2DA;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3A3630" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+            </div>
+          </div>
+          <span class="n val" style="font-size: 17px; font-weight: 600;">{{item.kcal}}<span style="font-size: 12px; font-weight: 400; color: #9A948A;"> kcal</span></span>
+        </div>
+      </div>
+    </sc-for>
+
+    <div class="tap" onClick="{{addItem}}" style="height: 50px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px dashed #DCD6CB; border-radius: 16px; color: #6B655C; font-size: 14px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B655C" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+      漏了什么？手动补一项
+    </div>
+
+  </div>
+
+  <div style="margin: 20px 20px 0 20px; background: #F4F1EA; border-radius: 16px; padding: 18px;">
+    <div style="display: flex; align-items: baseline; justify-content: space-between;">
+      <span style="font-size: 14px; font-weight: 500;">这一餐合计</span>
+      <span class="n val" style="font-size: 24px; font-weight: 600;">{{total.kcal}}<span style="font-size: 13px; font-weight: 400; color: #6B655C;"> kcal</span></span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px;">
+      <div style="display: flex; align-items: center; gap: 7px;">
+        <div style="width: 3px; height: 26px; border-radius: 2px; background: #4A6B4F;"></div>
+        <div>
+          <div class="n val" style="font-size: 15px; font-weight: 600;">{{total.p}}<span style="font-size: 11px; font-weight: 400; color: #9A948A;">g</span></div>
+          <div style="font-size: 11px; color: #9A948A;">蛋白质</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 7px;">
+        <div style="width: 3px; height: 26px; border-radius: 2px; background: #A8763E;"></div>
+        <div>
+          <div class="n val" style="font-size: 15px; font-weight: 600;">{{total.c}}<span style="font-size: 11px; font-weight: 400; color: #9A948A;">g</span></div>
+          <div style="font-size: 11px; color: #9A948A;">碳水</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 7px;">
+        <div style="width: 3px; height: 26px; border-radius: 2px; background: #8A5A6B;"></div>
+        <div>
+          <div class="n val" style="font-size: 15px; font-weight: 600;">{{total.f}}<span style="font-size: 11px; font-weight: 400; color: #9A948A;">g</span></div>
+          <div style="font-size: 11px; color: #9A948A;">脂肪</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin: 18px 20px 0 20px;">
+    <div style="font-size: 12px; color: #9A948A; margin-bottom: 9px;">记入</div>
+    <div style="display: flex; gap: 8px;">
+      <sc-for list="{{meals}}" as="m" hint-placeholder-count="4">
+        <div class="tap" onClick="{{m.pick}}" style="{{m.style}}">{{m.name}}</div>
+      </sc-for>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding: 13px 16px; border-radius: 12px; background: #FFFFFF; border: 1px solid #EFEBE4;">
+      <span style="font-size: 13px; color: #6B655C;">日期</span>
+      <span class="n" style="font-size: 13px; font-weight: 500;">9月16日 今天</span>
+    </div>
+  </div>
+
+  <div style="padding: 22px 20px 34px 20px;">
+    <div class="tap" style="height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 15px; background: #23201C; color: #FBFAF7; font-size: 15px; font-weight: 500;">{{saveLabel}}</div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      nextId: 4,
+      focusId: 3,
+      meal: '午餐',
+      items: [
+        { id: 1, name: '杂粮饭',     kc: 174, p: 4.2,  c: 37.1, f: 1.0,  g: 150, tag: false },
+        { id: 2, name: '香煎鸡胸肉', kc: 165, p: 31.0, c: 0,    f: 3.6,  g: 120, tag: false },
+        { id: 3, name: '蒜蓉西兰花', kc: 78,  p: 3.8,  c: 6.4,  f: 4.8,  g: 180, tag: true }
+      ]
+    };
+  }
+
+  step(id, delta) {
+    const items = this.state.items.map(function (it) {
+      if (it.id !== id) return it;
+      const g = Math.max(0, it.g + delta);
+      return Object.assign({}, it, { g: g, tag: false });
+    });
+    this.setState({ items: items, focusId: id });
+  }
+
+  remove(id) {
+    this.setState({ items: this.state.items.filter(function (it) { return it.id !== id; }) });
+  }
+
+  add() {
+    const id = this.state.nextId;
+    const extra = [
+      { name: '油',       kc: 884, p: 0,    c: 0,    f: 100, g: 8 },
+      { name: '水煮蛋',   kc: 143, p: 12.6, c: 1.1,  f: 9.5, g: 55 },
+      { name: '无糖酸奶', kc: 59,  p: 3.5,  c: 4.7,  f: 3.2, g: 100 }
+    ];
+    const pick = extra[(id - 4) % extra.length];
+    const next = Object.assign({ id: id, tag: false }, pick);
+    this.setState({ items: this.state.items.concat([next]), nextId: id + 1, focusId: id });
+  }
+
+  renderVals() {
+    const self = this;
+    const st = this.state;
+
+    const CARD = 'background: #FFFFFF; border-radius: 16px; padding: 16px 18px; border: 1px solid ';
+    const STEP_BASE = 'display: flex; align-items: center; border-radius: 12px; overflow: hidden; border: ';
+
+    const items = st.items.map(function (it) {
+      const focused = it.id === st.focusId;
+      return {
+        id: it.id,
+        name: it.name,
+        g: it.g,
+        hasTag: it.tag,
+        kcal: Math.round(it.kc * it.g / 100),
+        per100: it.kc + ' kcal / 100g · 蛋白 ' + it.p + ' · 碳水 ' + it.c + ' · 脂肪 ' + it.f,
+        cardStyle: CARD + (focused ? '#DCD6CB;' : '#EFEBE4;'),
+        stepperStyle: STEP_BASE + (focused ? '1.5px solid #23201C;' : '1px solid #E6E2DA;'),
+        inc: function () { self.step(it.id, 10); },
+        dec: function () { self.step(it.id, -10); },
+        del: function () { self.remove(it.id); }
+      };
+    });
+
+    let kcal = 0, p = 0, c = 0, f = 0;
+    st.items.forEach(function (it) {
+      const r = it.g / 100;
+      kcal += it.kc * r; p += it.p * r; c += it.c * r; f += it.f * r;
+    });
+
+    const ON = 'flex-grow: 1; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 13px; font-weight: 500; background: #23201C; color: #FBFAF7; border: 1px solid #23201C;';
+    const OFF = 'flex-grow: 1; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 13px; background: transparent; color: #6B655C; border: 1px solid #E6E2DA;';
+
+    const meals = ['早餐', '午餐', '晚餐', '加餐'].map(function (name) {
+      return {
+        name: name,
+        style: name === st.meal ? ON : OFF,
+        pick: function () { self.setState({ meal: name }); }
+      };
+    });
+
+    return {
+      items: items,
+      meals: meals,
+      countText: st.items.length + ' 项食物',
+      saveLabel: st.items.length === 0 ? '没有可保存的项目' : ('保存到' + st.meal),
+      addItem: function () { self.add(); },
+      total: {
+        kcal: Math.round(kcal),
+        p: Math.round(p),
+        c: Math.round(c),
+        f: Math.round(f)
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

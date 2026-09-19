@@ -1,0 +1,99 @@
+# FitMeal 服务端：Postgres + API 打包一起跑（在 server/ 目录下用）。
+#
+# 用法：
+#   cd server
+#   cp .env.docker.example .env.docker   # 按需改 SECRET_KEY / OPENAI_API_KEY
+#   docker compose --env-file .env.docker up --build -d
+#
+# 注意用的是 .env.docker 而不是 .env——server/.env 是本机直接跑 uvicorn
+# （不走 Docker）用的那份，两边字段有重叠但含义不同，用不同文件名避免
+# docker compose 默认读到 .env 把两边搅在一起。
+#
+# 迁移只在容器「重新建立」时跑一次：migrate 是个一次性服务，跑完
+# alembic upgrade head 就退出，api 要等它成功退出才启动。
+# `docker compose restart api` / `stop` / `start` 这类只动 api（或 db）的操作
+# 不会碰 migrate，不会重复迁移；只有 `docker compose up`（migrate 容器是
+# 新建的，或者代码/镜像变了触发重建）才会让它重新跑一次——反正 alembic
+# upgrade head 本身也是幂等的，已经是最新版时再跑一次也就是几秒内直接退出。
+
+name: fitmeal
+
+x-api-image: &api-image
+  build:
+    context: .
+
+x-api-env: &api-env
+  APP_ENV: production
+  # 生产必须换掉：这个值一变，所有已签发的 token 立即失效（同 .env.example 的提醒）。
+  SECRET_KEY: ${SECRET_KEY:-please-change-this-secret-key}
+  DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-fitmeal}:${POSTGRES_PASSWORD:-fitmeal}@db:5432/${POSTGRES_DB:-fitmeal}
+  ACCESS_TOKEN_TTL_MINUTES: ${ACCESS_TOKEN_TTL_MINUTES:-30}
+  REFRESH_TOKEN_TTL_DAYS: ${REFRESH_TOKEN_TTL_DAYS:-30}
+  PHOTO_RETENTION_DAYS: ${PHOTO_RETENTION_DAYS:-30}
+  MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-5242880}
+  # mock = 不需要 Key 也能跑通识别流程；接真实 Provider 就改成 openai 并填下面两行。
+  RECOGNIZER_PROVIDER: ${RECOGNIZER_PROVIDER:-mock}
+  RECOGNITION_TIMEOUT_SECONDS: ${RECOGNITION_TIMEOUT_SECONDS:-15}
+  DAILY_RECOGNITION_LIMIT: ${DAILY_RECOGNITION_LIMIT:-20}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+  OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+  # 客户端跨域来源；生产建议收窄成实际的前端地址，不要一直用 *。
+  CORS_ORIGINS: ${CORS_ORIGINS:-["*"]}
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fitmeal}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fitmeal}
+      POSTGRES_DB: ${POSTGRES_DB:-fitmeal}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fitmeal} -d ${POSTGRES_DB:-fitmeal}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # 只有本机工具需要直连数据库调试时才用得到；线上通常不对外暴露，可以删掉。
+    ports:
+      - "5432:5432"
+
+  # 一次性任务：alembic upgrade head 跑完就退出，不常驻、不重启。
+  migrate:
+    <<: *api-image
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *api-env
+
+  api:
+    <<: *api-image
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      <<: *api-env
+    volumes:
+      - photos:/data/photos
+    # 容器内部仍监听 8000（healthcheck 走的也是它），只是宿主机换成 8080 对外，
+    # 免得和本机直接跑的 uvicorn（默认 8000）撞端口。
+    ports:
+      - "8080:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u,sys; sys.exit(0 if u.urlopen('http://localhost:8000/health', timeout=3).status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  pgdata:
+  photos:

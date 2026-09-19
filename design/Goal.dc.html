@@ -1,0 +1,246 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+  <style>
+    body { margin: 0; background: #FBFAF7; color: #23201C;
+      font-family: "Noto Sans SC", system-ui, -apple-system, sans-serif;
+      font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #4A6B4F; text-decoration: none; } a:hover { color: #3A553D; }
+    .n { font-family: Archivo, system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+    .tap { cursor: pointer; user-select: none;
+      transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .09s ease; }
+    .tap:active { transform: scale(0.98); }
+    .track { cursor: pointer; }
+    .fill { transition: width .22s cubic-bezier(.2,.8,.2,1); }
+    .knob { transition: left .22s cubic-bezier(.2,.8,.2,1), border-color .18s ease; }
+    .val { transition: color .18s ease; }
+  </style>
+</helmet>
+
+<div style="width: 390px; padding: 52px 0 0 0; box-sizing: border-box;">
+
+  <div style="padding: 0 28px;">
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <div style="flex-grow: 1; height: 3px; border-radius: 2px; background: #23201C;"></div>
+      <div style="flex-grow: 1; height: 3px; border-radius: 2px; background: #23201C;"></div>
+      <div style="flex-grow: 1; height: 3px; border-radius: 2px; background: #23201C;"></div>
+    </div>
+    <div class="n" style="font-size: 11px; color: #9A948A; margin-top: 10px;">3 / 3</div>
+  </div>
+
+  <div style="padding: 26px 28px 0 28px;">
+    <div style="font-size: 27px; font-weight: 700; line-height: 1.32; letter-spacing: -0.025em;">想达成什么？</div>
+    <div style="font-size: 14px; color: #6B655C; line-height: 1.65; margin-top: 10px;">目标决定在你的消耗上加多少、减多少。</div>
+  </div>
+
+  <div style="padding: 30px 28px 0 28px;">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+
+      <div class="tap" onClick="{{goals.cut.pick}}" style="{{goals.cut.style}}">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="{{goals.cut.stroke}}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l6 6 4-4 6 6"></path><path d="M20 16v-6h-6"></path></svg>
+            <div>
+              <div style="{{goals.cut.nameStyle}}">减脂</div>
+              <div style="{{goals.cut.descStyle}}">在消耗基础上制造热量缺口</div>
+            </div>
+          </div>
+          <sc-if value="{{goals.cut.on}}" hint-placeholder-val="{{true}}">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FBFAF7" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+          </sc-if>
+        </div>
+      </div>
+
+      <div class="tap" onClick="{{goals.bulk.pick}}" style="{{goals.bulk.style}}">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="{{goals.bulk.stroke}}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l6-6 4 4 6-6"></path><path d="M20 8v6h-6"></path></svg>
+            <div>
+              <div style="{{goals.bulk.nameStyle}}">增肌</div>
+              <div style="{{goals.bulk.descStyle}}">小幅热量盈余，配合高蛋白</div>
+            </div>
+          </div>
+          <sc-if value="{{goals.bulk.on}}" hint-placeholder-val="{{false}}">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FBFAF7" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+          </sc-if>
+        </div>
+      </div>
+
+      <div class="tap" onClick="{{goals.keep.pick}}" style="{{goals.keep.style}}">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="{{goals.keep.stroke}}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"></path><path d="M6 8.5h12M6 15.5h12"></path></svg>
+            <div>
+              <div style="{{goals.keep.nameStyle}}">维持</div>
+              <div style="{{goals.keep.descStyle}}">吃到消耗水平，保持现状</div>
+            </div>
+          </div>
+          <sc-if value="{{goals.keep.on}}" hint-placeholder-val="{{false}}">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FBFAF7" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+          </sc-if>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="padding: 28px 28px 0 28px;">
+    <div style="background: #FFFFFF; border: 1px solid #E6E2DA; border-radius: 16px; padding: 20px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-size: 12px; color: #9A948A;">当前</div>
+          <div class="n" style="font-size: 22px; font-weight: 600; margin-top: 3px;">72.5<span style="font-size: 12px; font-weight: 400; color: #9A948A;"> kg</span></div>
+        </div>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B5AB9C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M14 7l5 5-5 5"></path></svg>
+        <div style="text-align: right;">
+          <div style="font-size: 12px; color: #9A948A;">目标</div>
+          <div class="n val" style="font-size: 22px; font-weight: 600; margin-top: 3px;">{{targetWeight}}<span style="font-size: 12px; font-weight: 400; color: #9A948A;"> kg</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{showRate}}" hint-placeholder-val="{{true}}">
+    <div style="padding: 22px 28px 0 28px;">
+      <div style="background: #FFFFFF; border: 1px solid #E6E2DA; border-radius: 16px; padding: 20px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px;">
+          <span style="font-size: 12px; color: #9A948A;">{{rateLabel}}</span>
+          <span class="n val" style="font-size: 17px; font-weight: 600;">{{rate}} <span style="font-size: 12px; font-weight: 400; color: #9A948A;">kg / 周</span></span>
+        </div>
+        <div class="track" onClick="{{setRate}}" style="position: relative; height: 26px; padding: 10px 0; margin: -10px 0;">
+          <div style="position: absolute; top: 21px; left: 0; right: 0; height: 4px; border-radius: 2px; background: #EAE6DF;"></div>
+          <div style="position: absolute; top: 21px; left: 73.3%; right: 0; height: 4px; border-radius: 0 2px 2px 0; background: #E4C9C5;"></div>
+          <div class="fill" style="{{rateFill}}"></div>
+          <div class="knob" style="{{rateKnob}}"></div>
+        </div>
+        <div class="n" style="display: flex; justify-content: space-between; font-size: 11px; color: #B5AB9C; margin-top: 17px;">
+          <span>0.25 温和</span><span style="color: #B0554F;">1.0 激进</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding-top: 16px; border-top: 1px solid #F2EFE9;">
+          <span style="font-size: 13px; color: #6B655C;">每日{{deficitWord}}</span>
+          <span class="n val" style="font-size: 14px; font-weight: 500;">{{deficitText}}</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+          <span style="font-size: 13px; color: #6B655C;">日均目标热量</span>
+          <span class="n val" style="font-size: 14px; font-weight: 500;">{{dailyKcal}} kcal</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+          <span style="font-size: 13px; color: #6B655C;">预计达成</span>
+          <span class="n val" style="font-size: 14px; font-weight: 500;">{{eta}}</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{tooFast}}" hint-placeholder-val="{{false}}">
+    <div style="margin: 18px 28px 0 28px; display: flex; gap: 11px; background: #F9EFEE; border-radius: 14px; padding: 15px 17px;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B0554F" stroke-width="1.9" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px;"><path d="M12 4l9 16H3l9-16z"></path><path d="M12 10v4"></path><path d="M12 17.2v.1"></path></svg>
+      <div style="font-size: 12px; color: #8A4842; line-height: 1.65;">{{tooFastText}}</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{safeHint}}" hint-placeholder-val="{{true}}">
+    <div style="margin: 18px 28px 0 28px; display: flex; gap: 11px; background: #F7F1EA; border-radius: 14px; padding: 15px 17px;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A8763E" stroke-width="1.9" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.2v.1"></path></svg>
+      <div style="font-size: 12px; color: #6B5B49; line-height: 1.65;">速率超过每周 0.8kg 时，算出的热量可能低于你的基础代谢——这种情况会自动按基础代谢兜底。</div>
+    </div>
+  </sc-if>
+
+  <div style="padding: 26px 28px 38px 28px; display: flex; gap: 10px;">
+    <div class="tap" style="width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 15px; border: 1px solid #E6E2DA;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23201C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </div>
+    <div class="tap" style="flex-grow: 1; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 15px; background: #23201C; color: #FBFAF7; font-size: 15px; font-weight: 500;">算出我的目标</div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { goal: 'cut', rate: 0.5 };
+  }
+
+  renderVals() {
+    const self = this;
+    const st = this.state;
+    const NOW = 72.5;
+    const TDEE = 2587;
+    const BMR = 1669;
+
+    const TARGETS = { cut: 68.0, bulk: 76.0, keep: 72.5 };
+    const target = TARGETS[st.goal];
+
+    const ON = 'background: #23201C; border-radius: 16px; padding: 18px 20px; border: 1.5px solid #23201C;';
+    const OFF = 'background: #FFFFFF; border-radius: 16px; padding: 18px 20px; border: 1px solid #E6E2DA;';
+
+    function goalVal(key) {
+      const on = st.goal === key;
+      return {
+        on: on,
+        style: on ? ON : OFF,
+        stroke: on ? '#FBFAF7' : '#9A948A',
+        nameStyle: on ? 'font-size: 15px; font-weight: 500; color: #FBFAF7;' : 'font-size: 15px; color: #3A3630;',
+        descStyle: on
+          ? 'font-size: 11px; color: rgba(251,250,247,0.55); margin-top: 2px;'
+          : 'font-size: 11px; color: #9A948A; margin-top: 2px;',
+        pick: function () { self.setState({ goal: key }); }
+      };
+    }
+
+    const cutting = st.goal === 'cut';
+    const bulking = st.goal === 'bulk';
+    const showRate = st.goal !== 'keep';
+
+    // 1 kg 体脂约 7700 kcal，摊到每天
+    const perDay = Math.round(st.rate * 7700 / 7 / 10) * 10;
+    const raw = cutting ? TDEE - perDay : (bulking ? TDEE + perDay : TDEE);
+    const clamped = Math.max(BMR, raw);
+
+    const gap = Math.abs(target - NOW);
+    const weeks = st.rate > 0 ? Math.round(gap / st.rate) : 0;
+    const done = new Date(2026, 8, 16 + weeks * 7);
+    const MONTH = done.getMonth() + 1;
+    const d = done.getDate();
+    const part = d <= 10 ? '月初' : (d <= 20 ? '月中旬' : '月底');
+
+    const pct = (st.rate - 0.25) / 0.75 * 100;
+    const danger = st.rate > 0.8;
+
+    return {
+      goals: { cut: goalVal('cut'), bulk: goalVal('bulk'), keep: goalVal('keep') },
+      targetWeight: target.toFixed(1),
+      showRate: showRate,
+      rate: st.rate.toFixed(2),
+      rateLabel: cutting ? '每周减重速率' : '每周增重速率',
+      deficitWord: cutting ? '热量缺口' : '热量盈余',
+      deficitText: (cutting ? '−' : '+') + perDay + ' kcal',
+      dailyKcal: clamped,
+      eta: weeks === 0 ? '已达成' : ('约 ' + weeks + ' 周 · ' + MONTH + part),
+      tooFast: raw < BMR,
+      tooFastText: '按这个速率算出的 ' + raw + ' kcal 已低于你的基础代谢 ' + BMR + '，已自动上调到 ' + BMR + ' kcal。建议把速率降下来。',
+      safeHint: danger && raw >= BMR,
+      rateFill: 'position: absolute; top: 21px; left: 0; width: ' + pct.toFixed(1) + '%; height: 4px; border-radius: 2px; background: ' + (danger ? '#B0554F' : '#23201C') + ';',
+      rateKnob: 'position: absolute; top: 10px; left: ' + pct.toFixed(1) + '%; margin-left: -13px; width: 26px; height: 26px; border-radius: 50%; background: #FFFFFF; border: 2px solid ' + (danger ? '#B0554F' : '#23201C') + '; box-shadow: 0 2px 6px rgba(35,32,28,0.12); box-sizing: border-box;',
+      setRate: function (e) {
+        const box = e.currentTarget.getBoundingClientRect();
+        if (!box.width) return;
+        let r = (e.clientX - box.left) / box.width;
+        r = Math.max(0, Math.min(1, r));
+        self.setState({ rate: Math.round((0.25 + r * 0.75) / 0.05) * 0.05 });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

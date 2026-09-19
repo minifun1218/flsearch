@@ -1,0 +1,22 @@
+# FitMeal 服务端依赖。开发环境：conda activate ai && pip install -r requirements.txt
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.9
+pydantic-settings>=2.4
+email-validator>=2.2
+python-multipart>=0.0.9
+
+SQLAlchemy[asyncio]>=2.0.30
+alembic>=1.13
+asyncpg>=0.29          # PostgreSQL（生产）
+aiosqlite>=0.20        # SQLite（开发 / 测试）
+greenlet>=3.0
+
+bcrypt>=4.1
+PyJWT>=2.9
+
+openai>=1.40           # OpenAI 兼容的多模态 Provider
+
+pytest>=8.0
+pytest-asyncio>=0.24
+httpx>=0.27

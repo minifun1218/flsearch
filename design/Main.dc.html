@@ -1,0 +1,333 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+  <style>
+    body { margin: 0; background: #FBFAF7; color: #23201C;
+      font-family: "Noto Sans SC", system-ui, -apple-system, sans-serif;
+      font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #4A6B4F; text-decoration: none; } a:hover { color: #3A553D; }
+    .n { font-family: Archivo, system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+    .tap { cursor: pointer; user-select: none;
+      transition: background-color .16s ease, color .16s ease, border-color .16s ease, opacity .16s ease, transform .09s ease; }
+    .tap:active { transform: scale(0.96); }
+    .bar { transition: width .4s cubic-bezier(.2,.8,.2,1); }
+    .val { transition: color .18s ease; }
+  </style>
+</helmet>
+
+<div style="width: 390px; padding: 52px 0 0 0; box-sizing: border-box;">
+
+  <!-- 日期条 -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px 18px 20px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A948A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+      <div>
+        <div class="n" style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">9月16日</div>
+        <div style="font-size: 12px; color: #9A948A; margin-top: 1px;">今天 · 周一</div>
+      </div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A948A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #EDF1EC; color: #4A6B4F; font-size: 12px; font-weight: 500;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4A6B4F" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 12h18"></path></svg>
+      训练日
+    </div>
+  </div>
+
+  <!-- 热量主卡 -->
+  <div style="margin: 0 20px; background: #FFFFFF; border: 1px solid #EFEBE4; border-radius: 18px; padding: 26px 22px 20px 22px;">
+
+    <div style="display: flex; align-items: center; justify-content: center; position: relative; height: 188px;">
+      <svg width="188" height="188" viewBox="0 0 188 188">
+        <circle cx="94" cy="94" r="80" fill="none" stroke="#F2EFE9" stroke-width="15"></circle>
+        <circle cx="94" cy="94" r="80" fill="none" stroke="#23201C" stroke-width="15" stroke-linecap="round"
+          stroke-dasharray="347 503" transform="rotate(-90 94 94)"></circle>
+      </svg>
+      <div class="tap" onClick="{{toggleCal}}" style="position: absolute; text-align: center; padding: 14px 22px;">
+        <div style="font-size: 12px; color: #9A948A; letter-spacing: 0.04em;">{{cal.label}}</div>
+        <div class="n val" style="font-size: 52px; font-weight: 600; line-height: 1.05; margin: 2px 0 0 0;">{{cal.value}}</div>
+        <div class="n" style="font-size: 13px; color: #6B655C;">kcal</div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; gap: 28px; margin-top: 8px; padding-bottom: 20px; border-bottom: 1px solid #F2EFE9;">
+      <div style="text-align: center;">
+        <div class="n" style="font-size: 17px; font-weight: 600;">1516</div>
+        <div style="font-size: 11px; color: #9A948A; margin-top: 2px;">已摄入</div>
+      </div>
+      <div style="width: 1px; background: #F2EFE9;"></div>
+      <div style="text-align: center;">
+        <div class="n" style="font-size: 17px; font-weight: 600;">2200</div>
+        <div style="font-size: 11px; color: #9A948A; margin-top: 2px;">训练日目标</div>
+      </div>
+    </div>
+
+    <!-- 三大项 -->
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; padding-top: 18px;">
+
+      <div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 7px;">
+          <span style="font-size: 12px; color: #6B655C;">蛋白质</span>
+          <span class="n" style="font-size: 11px; color: #9A948A;">剩 19</span>
+        </div>
+        <div style="height: 5px; border-radius: 3px; background: #F2EFE9; overflow: hidden;">
+          <div style="width: 85%; height: 100%; background: #4A6B4F; border-radius: 3px;"></div>
+        </div>
+        <div class="n" style="font-size: 13px; margin-top: 7px;"><span style="font-weight: 600;">112</span><span style="color: #9A948A;">/131g</span></div>
+      </div>
+
+      <div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 7px;">
+          <span style="font-size: 12px; color: #6B655C;">碳水</span>
+          <span class="n" style="font-size: 11px; color: #9A948A;">剩 127</span>
+        </div>
+        <div style="height: 5px; border-radius: 3px; background: #F2EFE9; overflow: hidden;">
+          <div style="width: 56%; height: 100%; background: #A8763E; border-radius: 3px;"></div>
+        </div>
+        <div class="n" style="font-size: 13px; margin-top: 7px;"><span style="font-weight: 600;">164</span><span style="color: #9A948A;">/291g</span></div>
+      </div>
+
+      <div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 7px;">
+          <span style="font-size: 12px; color: #6B655C;">脂肪</span>
+          <span class="n" style="font-size: 11px; color: #9A948A;">剩 9</span>
+        </div>
+        <div style="height: 5px; border-radius: 3px; background: #F2EFE9; overflow: hidden;">
+          <div style="width: 84%; height: 100%; background: #8A5A6B; border-radius: 3px;"></div>
+        </div>
+        <div class="n" style="font-size: 13px; margin-top: 7px;"><span style="font-weight: 600;">48</span><span style="color: #9A948A;">/57g</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 饮水 -->
+  <div style="margin: 12px 20px 0 20px; background: #FFFFFF; border: 1px solid #EFEBE4; border-radius: 18px; padding: 18px 20px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+      <div style="display: flex; align-items: center; gap: 9px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4A6480" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 10.5a6 6 0 01-12 0C6 9.5 12 3 12 3z"></path></svg>
+        <span style="font-size: 14px; font-weight: 500;">饮水</span>
+      </div>
+      <div class="n" style="font-size: 13px;"><span class="val" style="font-weight: 600;">{{water.ml}}</span><span style="color: #9A948A;"> / 3038 ml</span></div>
+    </div>
+    <div style="height: 5px; border-radius: 3px; background: #F2EFE9; overflow: hidden; margin-bottom: 14px;">
+      <div class="bar" style="{{water.barStyle}}"></div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <div class="tap" onClick="{{water.add200}}" style="flex-grow: 1; height: 44px; display: flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid #E6E2DA; border-radius: 12px; font-size: 13px; color: #3A3630;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3A3630" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+        <span class="n">200 ml</span>
+      </div>
+      <div class="tap" onClick="{{water.add500}}" style="flex-grow: 1; height: 44px; display: flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid #E6E2DA; border-radius: 12px; font-size: 13px; color: #3A3630;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3A3630" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+        <span class="n">500 ml</span>
+      </div>
+      <div class="tap" onClick="{{water.undo}}" style="{{water.undoStyle}}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B655C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M3.5 13a9 9 0 103-7.7L3 8"></path></svg>
+      </div>
+    </div>
+    <sc-if value="{{water.done}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; align-items: center; gap: 7px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #F2EFE9;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4A6480" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+        <span style="font-size: 12px; color: #4A6480;">今天的水喝够了</span>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- 餐次 -->
+  <div style="padding: 26px 20px 0 20px; display: flex; flex-direction: column; gap: 10px;">
+
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2px;">
+      <span style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em;">今日记录</span>
+      <span class="n" style="font-size: 12px; color: #9A948A;">3 餐 · 9 项</span>
+    </div>
+
+    <!-- 早餐 -->
+    <div style="background: #FFFFFF; border: 1px solid #EFEBE4; border-radius: 16px; overflow: hidden;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 18px 12px 18px;">
+        <span style="font-size: 14px; font-weight: 500;">早餐</span>
+        <span class="n" style="font-size: 13px; color: #6B655C;">452 kcal</span>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-top: 1px solid #F5F2EC;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 14px;">全麦吐司</span>
+            <span class="n" style="font-size: 12px; color: #9A948A;">80 g</span>
+          </div>
+          <span class="n" style="font-size: 13px; color: #6B655C;">212</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-top: 1px solid #F5F2EC;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 14px;">水煮蛋</span>
+            <span class="n" style="font-size: 12px; color: #9A948A;">2 个 · 110 g</span>
+          </div>
+          <span class="n" style="font-size: 13px; color: #6B655C;">157</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px 15px 18px; border-top: 1px solid #F5F2EC;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 14px;">无糖豆浆</span>
+            <span class="n" style="font-size: 12px; color: #9A948A;">250 ml</span>
+          </div>
+          <span class="n" style="font-size: 13px; color: #6B655C;">83</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 午餐 -->
+    <div style="background: #FFFFFF; border: 1px solid #EFEBE4; border-radius: 16px; overflow: hidden;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 18px 12px 18px;">
+        <span style="font-size: 14px; font-weight: 500;">午餐</span>
+        <span class="n" style="font-size: 13px; color: #6B655C;">686 kcal</span>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-top: 1px solid #F5F2EC;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 14px;">杂粮饭</span>
+            <span class="n" style="font-size: 12px; color: #9A948A;">200 g</span>
+          </div>
+          <span class="n" style="font-size: 13px; color: #6B655C;">348</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-top: 1px solid #F5F2EC;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 14px;">香煎鸡胸肉</span>
+            <span class="n" style="font-size: 12px; color: #9A948A;">120 g</span>
+          </div>
+          <span class="n" style="font-size: 13px; color: #6B655C;">198</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px 15px 18px; border-top: 1px solid #F5F2EC;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 14px;">蒜蓉西兰花</span>
+            <span class="n" style="font-size: 12px; color: #9A948A;">180 g</span>
+          </div>
+          <span class="n" style="font-size: 13px; color: #6B655C;">140</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 晚餐 · 空态 -->
+    <div style="background: #FFFFFF; border: 1px dashed #E2DDD4; border-radius: 16px; padding: 15px 18px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-size: 14px; font-weight: 500;">晚餐</div>
+          <div style="font-size: 12px; color: #9A948A; margin-top: 3px;">还没有记录 · 建议 660 kcal</div>
+        </div>
+        <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #F5F2EC;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3A3630" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 加餐 -->
+    <div style="background: #FFFFFF; border: 1px solid #EFEBE4; border-radius: 16px; overflow: hidden;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 18px 12px 18px;">
+        <span style="font-size: 14px; font-weight: 500;">加餐</span>
+        <span class="n" style="font-size: 13px; color: #6B655C;">378 kcal</span>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-top: 1px solid #F5F2EC;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 14px;">乳清蛋白粉</span>
+            <span class="n" style="font-size: 12px; color: #9A948A;">30 g</span>
+          </div>
+          <span class="n" style="font-size: 13px; color: #6B655C;">120</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-top: 1px solid #F5F2EC;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 14px;">香蕉</span>
+            <span class="n" style="font-size: 12px; color: #9A948A;">120 g</span>
+          </div>
+          <span class="n" style="font-size: 13px; color: #6B655C;">106</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px 15px 18px; border-top: 1px solid #F5F2EC;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 14px;">混合坚果</span>
+            <span class="n" style="font-size: 12px; color: #9A948A;">25 g</span>
+          </div>
+          <span class="n" style="font-size: 13px; color: #6B655C;">152</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 底部导航 -->
+  <div style="position: relative; margin-top: 28px;">
+    <div style="position: absolute; top: -74px; right: 20px; width: 58px; height: 58px; border-radius: 19px; background: #23201C; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(35,32,28,0.24);">
+      <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#FBFAF7" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A1.5 1.5 0 014.5 7h2.2l1.3-2h7l1.3 2h2.2A1.5 1.5 0 0120 8.5v9a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 013 17.5v-9z"></path><circle cx="11.5" cy="12.5" r="3.4"></circle></svg>
+    </div>
+    <div style="border-top: 1px solid #EFEBE4; background: #FDFCFA; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; padding: 12px 0 26px 0;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#23201C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path></svg>
+        <span style="font-size: 10px; color: #23201C; font-weight: 500;">今日</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9A948A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V11M10 19V5M16 19v-6M22 19H2"></path></svg>
+        <span style="font-size: 10px; color: #9A948A;">统计</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9A948A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 20a6.5 6.5 0 0113 0"></path><circle cx="12" cy="8" r="4"></circle></svg>
+        <span style="font-size: 10px; color: #9A948A;">我的</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { waterMl: 1200, history: [], calMode: 'left' };
+  }
+
+  pour(amount) {
+    const next = Math.min(6000, this.state.waterMl + amount);
+    this.setState({ waterMl: next, history: this.state.history.concat([amount]) });
+  }
+
+  undo() {
+    const h = this.state.history;
+    if (h.length === 0) return;
+    const last = h[h.length - 1];
+    this.setState({ waterMl: Math.max(0, this.state.waterMl - last), history: h.slice(0, -1) });
+  }
+
+  renderVals() {
+    const self = this;
+    const st = this.state;
+    const GOAL = 3038;
+    const pct = Math.min(100, Math.round(st.waterMl / GOAL * 100));
+    const canUndo = st.history.length > 0;
+
+    const UNDO_ON = 'width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid #E6E2DA; border-radius: 12px; opacity: 1;';
+    const UNDO_OFF = 'width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid #F2EFE9; border-radius: 12px; opacity: 0.35;';
+
+    return {
+      water: {
+        ml: st.waterMl,
+        done: st.waterMl >= GOAL,
+        barStyle: 'width: ' + pct + '%; height: 100%; background: #4A6480; border-radius: 3px;',
+        undoStyle: canUndo ? UNDO_ON : UNDO_OFF,
+        add200: function () { self.pour(200); },
+        add500: function () { self.pour(500); },
+        undo: function () { self.undo(); }
+      },
+      cal: st.calMode === 'left'
+        ? { label: '还可摄入', value: 684 }
+        : { label: '已摄入', value: 1516 },
+      toggleCal: function () {
+        self.setState({ calMode: st.calMode === 'left' ? 'eaten' : 'left' });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
