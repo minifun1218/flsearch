@@ -116,6 +116,30 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('档案中的当前体重可以修改，越界值不能保存', (tester) async {
+    final container = await pump(tester);
+    await tester.tap(find.text('我的').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('编辑'));
+    await tester.pumpAndSettle();
+
+    final currentWeight = find.byWidgetPredicate(
+      (widget) => widget is TextField && widget.decoration?.labelText == '当前体重',
+    );
+    await tester.ensureVisible(currentWeight);
+    await tester.enterText(currentWeight, '500');
+    await tester.tap(find.text('保存'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('当前/目标体重（20–300）'), findsOneWidget);
+    expect(container.read(profileProvider).weightKg, 72.5);
+
+    await tester.enterText(currentWeight, '74.2');
+    await tester.tap(find.text('保存'));
+    await tester.pumpAndSettle();
+    expect(container.read(profileProvider).weightKg, 74.2);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('档案拒绝反向减脂目标，训练日期可以修改', (tester) async {
     final container = await pump(tester, width: 320);
     await tester.tap(find.text('我的').last);

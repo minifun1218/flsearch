@@ -281,19 +281,12 @@ class _CapturePageState extends ConsumerState<CapturePage>
     return Scaffold(
       backgroundColor: const Color(0xFF191713),
       body: SafeArea(
-        child: Column(
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            _TopBar(
-              analyzing: _analyzing,
-              torchOn: _torch,
-              canTorch: ready,
-              onToggleTorch: _toggleTorch,
-              onClose: () => Navigator.of(context).pop(false),
-            ),
-            const SizedBox(height: 32),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
+            Positioned.fill(
               child: _Viewfinder(
+                fullScreen: true,
                 analyzing: _analyzing,
                 scan: _scan,
                 camera: _camera,
@@ -303,29 +296,51 @@ class _CapturePageState extends ConsumerState<CapturePage>
                 onRetry: _openCamera,
               ),
             ),
-            const SizedBox(height: 26),
-            Expanded(
-              child: _analyzing
-                  ? _AnalyzingBody(found: _found)
-                  : _ReadyBody(
-                      meal: _meal,
-                      error: _error,
-                      cameraReady: ready,
-                      onPickMeal: (m) => setState(() => _meal = m),
-                    ),
-            ),
-            if (_analyzing)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
-                child: _GhostButton(label: '取消', onTap: _cancelAnalyzing),
-              )
-            else
-              _ShutterBar(
-                ready: ready,
-                onShoot: _shoot,
-                onGallery: _pickFromGallery,
-                onManual: () => Navigator.of(context).pop('manual'),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: _TopBar(
+                analyzing: _analyzing,
+                torchOn: _torch,
+                canTorch: ready,
+                onToggleTorch: _toggleTorch,
+                onClose: () => Navigator.of(context).pop(false),
               ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 250),
+                    child: _analyzing
+                        ? _AnalyzingBody(found: _found)
+                        : _ReadyBody(
+                            meal: _meal,
+                            error: _error,
+                            cameraReady: ready,
+                            onPickMeal: (m) => setState(() => _meal = m),
+                          ),
+                  ),
+                  if (_analyzing)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(30, 0, 30, 30),
+                      child: _GhostButton(label: '取消', onTap: _cancelAnalyzing),
+                    )
+                  else
+                    _ShutterBar(
+                      ready: ready,
+                      onShoot: _shoot,
+                      onGallery: _pickFromGallery,
+                      onManual: () => Navigator.of(context).pop('manual'),
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -413,6 +428,7 @@ class _RoundButton extends StatelessWidget {
 
 class _Viewfinder extends StatelessWidget {
   const _Viewfinder({
+    this.fullScreen = false,
     required this.analyzing,
     required this.scan,
     required this.camera,
@@ -422,6 +438,7 @@ class _Viewfinder extends StatelessWidget {
     required this.onRetry,
   });
 
+  final bool fullScreen;
   final bool analyzing;
   final Animation<double> scan;
   final CameraController? camera;
@@ -432,95 +449,88 @@ class _Viewfinder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 330 / 330,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(6),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: ColoredBox(
-                color: const Color(0xFF24211C),
-                child: Opacity(
-                  opacity: analyzing ? 0.55 : 1,
-                  child: _surface(),
-                ),
-              ),
+    final frame = ClipRRect(
+      borderRadius: BorderRadius.circular(fullScreen ? 0 : 6),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ColoredBox(
+              color: const Color(0xFF24211C),
+              child: _surface(),
             ),
-            if (!analyzing && cameraError != null)
-              Positioned.fill(
-                child: _CameraFallback(message: cameraError!, onRetry: onRetry),
-              ),
-            if (!analyzing && cameraError == null && opening)
-              const Positioned.fill(child: _CameraOpening()),
-            if (!analyzing)
-              for (final corner in const [
-                Alignment.topLeft,
-                Alignment.topRight,
-                Alignment.bottomLeft,
-                Alignment.bottomRight,
-              ])
-                Align(
-                  alignment: corner,
-                  child: CustomPaint(
-                    size: const Size(30, 30),
-                    painter: _CornerPainter(corner),
-                  ),
+          ),
+          if (!analyzing && cameraError != null)
+            Positioned.fill(
+              child: _CameraFallback(message: cameraError!, onRetry: onRetry),
+            ),
+          if (!analyzing && cameraError == null && opening)
+            const Positioned.fill(child: _CameraOpening()),
+          if (!analyzing)
+            for (final corner in const [
+              Alignment.topLeft,
+              Alignment.topRight,
+              Alignment.bottomLeft,
+              Alignment.bottomRight,
+            ])
+              Align(
+                alignment: corner,
+                child: CustomPaint(
+                  size: const Size(30, 30),
+                  painter: _CornerPainter(corner),
                 ),
-            if (analyzing)
-              AnimatedBuilder(
-                animation: scan,
-                builder: (context, _) {
-                  return LayoutBuilder(
-                    builder: (context, box) {
-                      final y = box.maxHeight * scan.value;
-                      return Stack(
-                        children: [
-                          Positioned(
-                            top: y,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              height: 2,
-                              decoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color(0x007AA080),
-                                    Color(0xFF7AA080),
-                                    Color(0x007AA080),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: y,
-                            left: 0,
-                            right: 0,
-                            height: 74,
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Color(0x297AA080),
-                                    Color(0x007AA080),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
               ),
-          ],
-        ),
+          if (analyzing)
+            AnimatedBuilder(
+              animation: scan,
+              builder: (context, _) {
+                return LayoutBuilder(
+                  builder: (context, box) {
+                    final y = box.maxHeight * scan.value;
+                    return Stack(
+                      children: [
+                        Positioned(
+                          top: y,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            height: 2,
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0x007AA080),
+                                  Color(0xFF7AA080),
+                                  Color(0x007AA080),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: y,
+                          left: 0,
+                          right: 0,
+                          height: 74,
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Color(0x297AA080), Color(0x007AA080)],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+        ],
       ),
     );
+    if (fullScreen) return SizedBox.expand(child: frame);
+    return AspectRatio(aspectRatio: 330 / 330, child: frame);
   }
 
   /// 取景框里放什么：识别中放刚拍的那张，其次放实时预览，都没有就退回占位图形。
@@ -529,7 +539,8 @@ class _Viewfinder extends StatelessWidget {
     if (analyzing && path != null) {
       return Image.file(
         File(path),
-        fit: BoxFit.cover,
+        // 保留相机画面的完整内容，避免为了铺满正方形取景框而裁掉餐盘边缘。
+        fit: BoxFit.contain,
         width: double.infinity,
         height: double.infinity,
         errorBuilder: (_, _, _) => CustomPaint(painter: _PlatePainter()),
@@ -540,9 +551,10 @@ class _Viewfinder extends StatelessWidget {
     if (controller != null && controller.value.isInitialized) {
       final preview = controller.value.previewSize;
       if (preview == null) return CameraPreview(controller);
-      // previewSize 用的是传感器方向（横向），竖屏要换轴再按 cover 铺满。
+      // previewSize 用的是传感器方向（横向），竖屏要换轴再完整放入取景框。
       return FittedBox(
-        fit: BoxFit.cover,
+        // 与拍下的照片保持一致，完整显示相机预览，不裁切画面边缘。
+        fit: BoxFit.contain,
         clipBehavior: Clip.hardEdge,
         child: SizedBox(
           width: preview.height,

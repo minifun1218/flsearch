@@ -264,42 +264,25 @@ class ProfilePage extends ConsumerWidget {
                   '点选训练日，目标会按新的周计划重新计算。',
                   style: AppFonts.text(size: 11, color: AppColors.ink4),
                 ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<TrainingType>(
-                  initialValue: profile.plan.type,
-                  decoration: const InputDecoration(labelText: '训练类型'),
-                  items: [
-                    for (final type in TrainingType.values)
-                      DropdownMenuItem(value: type, child: Text(type.label)),
-                  ],
-                  onChanged: (type) {
-                    if (type != null) {
-                      ref
-                          .read(profileProvider.notifier)
-                          .update(
-                            (value) => value.copyWith(
-                              plan: value.plan.copyWith(type: type),
-                            ),
-                          );
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  '单次时长 ${profile.plan.minutes} 分钟',
-                  style: AppFonts.text(size: 13, color: AppColors.ink2),
-                ),
-                Slider(
-                  min: 15,
-                  max: 180,
-                  divisions: 33,
-                  value: profile.plan.minutes.toDouble().clamp(15, 180),
-                  label: '${profile.plan.minutes} 分钟',
+                const SizedBox(height: 18),
+                _TrainingDurationField(
+                  minutes: profile.plan.minutes,
                   onChanged: (minutes) => ref
                       .read(profileProvider.notifier)
                       .update(
                         (value) => value.copyWith(
-                          plan: value.plan.copyWith(minutes: minutes.round()),
+                          plan: value.plan.copyWith(minutes: minutes),
+                        ),
+                      ),
+                ),
+                const SizedBox(height: 20),
+                _TrainingTypeField(
+                  value: profile.plan.type,
+                  onChanged: (type) => ref
+                      .read(profileProvider.notifier)
+                      .update(
+                        (value) => value.copyWith(
+                          plan: value.plan.copyWith(type: type),
                         ),
                       ),
                 ),
@@ -432,8 +415,9 @@ class ProfilePage extends ConsumerWidget {
       await ref.read(sessionProvider.notifier).signOut();
     } on Object catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(describeError(e))));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(describeError(e))));
       }
     }
   }
@@ -449,8 +433,9 @@ class ProfilePage extends ConsumerWidget {
       await ref.read(sessionProvider.notifier).deleteAccount();
     } on Object catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(describeError(e))));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(describeError(e))));
       }
     }
   }
@@ -508,12 +493,14 @@ class ProfilePage extends ConsumerWidget {
   ) async {
     final kg = await showDialog<double>(
       context: context,
+      barrierColor: AppColors.ink.withValues(alpha: 0.38),
       builder: (_) => _WeightDialog(profile: profile),
     );
     if (!context.mounted || kg == null) return;
 
-    final recorded =
-        await ref.read(weightStoreProvider.notifier).record(DateTime.now(), kg);
+    final recorded = await ref
+        .read(weightStoreProvider.notifier)
+        .record(DateTime.now(), kg);
     if (recorded == null) return; // 失败的提示已经由仓储层冒出来了
 
     // 服务端记体重时就把档案里的体重改了，这里只对齐本地。
@@ -527,7 +514,7 @@ class ProfilePage extends ConsumerWidget {
           delta == 0
               ? '体重已记录，每日目标不变'
               : '体重已记录，每日目标 ${recorded.dailyKcalBefore} → '
-                  '${recorded.dailyKcalAfter} kcal',
+                    '${recorded.dailyKcalAfter} kcal',
         ),
       ),
     );
@@ -628,6 +615,164 @@ class _TargetsRoute extends StatelessWidget {
       Scaffold(body: const TargetsPage(showBackButton: true));
 }
 
+class _TrainingTypeField extends StatelessWidget {
+  const _TrainingTypeField({required this.value, required this.onChanged});
+
+  final TrainingType value;
+  final ValueChanged<TrainingType> onChanged;
+
+  static IconData _iconFor(TrainingType type) => switch (type) {
+    TrainingType.strength => Icons.fitness_center,
+    TrainingType.cardio => Icons.directions_run,
+    TrainingType.mixed => Icons.sync,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(AppRadius.field),
+      borderSide: const BorderSide(color: AppColors.border),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('训练类型', style: AppFonts.text(size: 12, color: AppColors.ink3)),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<TrainingType>(
+          initialValue: value,
+          isExpanded: true,
+          borderRadius: BorderRadius.circular(AppRadius.field),
+          dropdownColor: AppColors.surface,
+          elevation: 2,
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            size: 20,
+            color: AppColors.ink3,
+          ),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: AppColors.surfaceAlt,
+            contentPadding: const EdgeInsets.fromLTRB(15, 8, 12, 8),
+            enabledBorder: border,
+            focusedBorder: border.copyWith(
+              borderSide: const BorderSide(color: AppColors.ink, width: 1.2),
+            ),
+          ),
+          items: [
+            for (final type in TrainingType.values)
+              DropdownMenuItem(
+                value: type,
+                child: Row(
+                  children: [
+                    Icon(_iconFor(type), size: 18, color: AppColors.ink2),
+                    const SizedBox(width: 12),
+                    Text(
+                      type.label,
+                      style: AppFonts.text(
+                        size: 14,
+                        weight: type == value
+                            ? FontWeight.w500
+                            : FontWeight.w400,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+          onChanged: (type) {
+            if (type != null) onChanged(type);
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _TrainingDurationField extends StatelessWidget {
+  const _TrainingDurationField({
+    required this.minutes,
+    required this.onChanged,
+  });
+
+  final int minutes;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Expanded(
+              child: Text(
+                '单次训练时长',
+                style: AppFonts.text(size: 12, color: AppColors.ink3),
+              ),
+            ),
+            NumText('$minutes', size: 18),
+            const SizedBox(width: 4),
+            Text('分钟', style: AppFonts.text(size: 11, color: AppColors.ink3)),
+          ],
+        ),
+        const SizedBox(height: 2),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: AppColors.ink,
+            inactiveTrackColor: AppColors.line,
+            trackHeight: 4,
+            thumbColor: AppColors.ink,
+            thumbShape: const RoundSliderThumbShape(
+              enabledThumbRadius: 7,
+              elevation: 0,
+            ),
+            overlayColor: AppColors.ink.withValues(alpha: 0.07),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 17),
+            valueIndicatorColor: AppColors.surfaceDark,
+            valueIndicatorTextStyle: AppFonts.text(
+              size: 11,
+              weight: FontWeight.w500,
+              color: AppColors.onDark,
+            ),
+            showValueIndicator: ShowValueIndicator.onlyForDiscrete,
+          ),
+          child: Slider(
+            min: 15,
+            max: 180,
+            divisions: 33,
+            value: minutes.toDouble().clamp(15, 180),
+            label: '$minutes 分钟',
+            onChanged: (value) => onChanged(value.round()),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              NumText(
+                '15',
+                size: 10,
+                weight: FontWeight.w400,
+                color: AppColors.ink4,
+              ),
+              NumText(
+                '180 分钟',
+                size: 10,
+                weight: FontWeight.w400,
+                color: AppColors.ink4,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _WeightDialog extends StatefulWidget {
   const _WeightDialog({required this.profile});
   final UserProfile profile;
@@ -669,47 +814,214 @@ class _WeightDialogState extends State<_WeightDialog> {
           ).dailyKcal
         : before;
     final delta = after - before;
-    return AlertDialog(
-      title: const Text('记录今天的体重'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: _controller,
-            autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              labelText: '体重',
-              suffixText: 'kg',
-              errorText: _error,
-            ),
-            onChanged: (_) => setState(() => _error = null),
-            onSubmitted: (_) => _save(),
+    final now = DateTime.now();
+    final fieldBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(AppRadius.field),
+      borderSide: const BorderSide(color: AppColors.border),
+    );
+
+    return Dialog(
+      backgroundColor: AppColors.surface,
+      elevation: 8,
+      shadowColor: AppColors.ink.withValues(alpha: 0.12),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '记录今天的体重',
+                      style: AppFonts.text(
+                        size: 18,
+                        weight: FontWeight.w600,
+                        letterSpacing: -0.18,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: '关闭',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints.tightFor(
+                      width: 36,
+                      height: 36,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      size: 19,
+                      color: AppColors.ink3,
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                '${now.month} 月 ${now.day} 日 · 再次记录会更新今天的数据',
+                style: AppFonts.text(size: 11, color: AppColors.ink3),
+              ),
+              const SizedBox(height: 22),
+              Text('体重', style: AppFonts.text(size: 12, color: AppColors.ink3)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _controller,
+                autofocus: true,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                style: AppFonts.number(size: 30, weight: FontWeight.w600),
+                decoration: InputDecoration(
+                  hintText: '70.5',
+                  hintStyle: AppFonts.number(
+                    size: 30,
+                    weight: FontWeight.w500,
+                    color: AppColors.ink4,
+                  ),
+                  suffix: Text(
+                    'kg',
+                    style: AppFonts.text(size: 13, color: AppColors.ink3),
+                  ),
+                  errorText: _error,
+                  errorStyle: AppFonts.text(size: 11, color: AppColors.danger),
+                  filled: true,
+                  fillColor: AppColors.surfaceAlt,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 13,
+                  ),
+                  enabledBorder: fieldBorder,
+                  focusedBorder: fieldBorder.copyWith(
+                    borderSide: const BorderSide(
+                      color: AppColors.ink,
+                      width: 1.3,
+                    ),
+                  ),
+                  errorBorder: fieldBorder.copyWith(
+                    borderSide: const BorderSide(color: AppColors.danger),
+                  ),
+                  focusedErrorBorder: fieldBorder.copyWith(
+                    borderSide: const BorderSide(
+                      color: AppColors.danger,
+                      width: 1.3,
+                    ),
+                  ),
+                ),
+                onChanged: (_) => setState(() => _error = null),
+                onSubmitted: (_) => _save(),
+              ),
+              if (valid) ...[
+                const SizedBox(height: 12),
+                _WeightTargetPreview(
+                  before: before,
+                  after: after,
+                  delta: delta,
+                ),
+              ],
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 72,
+                    height: 48,
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        '取消',
+                        style: AppFonts.text(size: 14, color: AppColors.ink2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: AppButton('保存并更新目标', height: 48, onPressed: _save),
+                  ),
+                ],
+              ),
+            ],
           ),
-          if (valid) ...[
-            const SizedBox(height: 18),
-            Text(
-              '日均目标 $before → $after kcal',
-              style: AppFonts.text(size: 13, weight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+}
+
+class _WeightTargetPreview extends StatelessWidget {
+  const _WeightTargetPreview({
+    required this.before,
+    required this.after,
+    required this.delta,
+  });
+
+  final int before;
+  final int after;
+  final int delta;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAlt,
+        borderRadius: BorderRadius.circular(AppRadius.control),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '更新后的日均目标',
+                  style: AppFonts.text(size: 11, color: AppColors.ink3),
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    NumText('$after', size: 19),
+                    const SizedBox(width: 4),
+                    Text(
+                      'kcal',
+                      style: AppFonts.text(size: 10, color: AppColors.ink3),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 5),
-            Text(
-              delta == 0
-                  ? '与当前目标相同'
-                  : '${delta > 0 ? '增加' : '减少'} ${delta.abs()} kcal，保存后生效',
-              style: AppFonts.text(size: 12, color: AppColors.ink3),
-            ),
-          ],
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                delta == 0
+                    ? '目标不变'
+                    : '${delta > 0 ? '+' : '−'}${delta.abs()} kcal',
+                style: AppFonts.text(
+                  size: 12,
+                  weight: FontWeight.w500,
+                  color: delta == 0 ? AppColors.ink2 : AppColors.positive,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                '当前 $before kcal',
+                style: AppFonts.text(size: 10, color: AppColors.ink4),
+              ),
+            ],
+          ),
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
-        ),
-        TextButton(onPressed: _save, child: const Text('保存并更新目标')),
-      ],
     );
   }
 }
@@ -768,6 +1080,9 @@ class _ProfileEditorState extends State<_ProfileEditor> {
   late final _height = TextEditingController(
     text: ProfilePage._number(widget.profile.heightCm),
   );
+  late final _weight = TextEditingController(
+    text: ProfilePage._number(widget.profile.weightKg),
+  );
   late final _targetWeight = TextEditingController(
     text: ProfilePage._number(widget.profile.targetWeightKg),
   );
@@ -784,6 +1099,7 @@ class _ProfileEditorState extends State<_ProfileEditor> {
   @override
   void dispose() {
     _height.dispose();
+    _weight.dispose();
     _targetWeight.dispose();
     _bodyFat.dispose();
     super.dispose();
@@ -793,6 +1109,7 @@ class _ProfileEditorState extends State<_ProfileEditor> {
   /// 底部预览用它算「保存后」的热量，保存按钮用它决定能不能走。
   ({UserProfile? profile, String? error}) _evaluate() {
     final height = double.tryParse(_height.text.trim());
+    final weight = double.tryParse(_weight.text.trim());
     final target = double.tryParse(_targetWeight.text.trim());
     final fatText = _bodyFat.text.trim();
     final fat = fatText.isEmpty ? null : double.tryParse(fatText);
@@ -801,16 +1118,20 @@ class _ProfileEditorState extends State<_ProfileEditor> {
         !height.isFinite ||
         height < 100 ||
         height > 230 ||
+        weight == null ||
+        !weight.isFinite ||
+        weight < 20 ||
+        weight > 300 ||
         target == null ||
         !target.isFinite ||
         target < 20 ||
         target > 300 ||
         (fatText.isNotEmpty &&
             (fat == null || !fat.isFinite || fat < 3 || fat > 60))) {
-      return (profile: null, error: '请检查身高（100–230）、目标体重（20–300）和体脂率（3–60）');
+      return (profile: null, error: '请检查身高（100–230）、当前/目标体重（20–300）和体脂率（3–60）');
     }
-    if ((_goal == GoalType.cut && target >= widget.profile.weightKg) ||
-        (_goal == GoalType.bulk && target <= widget.profile.weightKg)) {
+    if ((_goal == GoalType.cut && target >= weight) ||
+        (_goal == GoalType.bulk && target <= weight)) {
       return (
         profile: null,
         error: _goal == GoalType.cut ? '减脂目标体重需要低于当前体重' : '增肌目标体重需要高于当前体重',
@@ -821,6 +1142,7 @@ class _ProfileEditorState extends State<_ProfileEditor> {
         sex: _sex,
         birthDate: _birthDate,
         heightCm: height,
+        weightKg: weight,
         targetWeightKg: target,
         bodyFatPercent: fat,
         activityLevel: _activity,
@@ -841,6 +1163,13 @@ class _ProfileEditorState extends State<_ProfileEditor> {
   }
 
   void _touch() => setState(() => _error = null);
+
+  void _touchWeight() {
+    if (_goal == GoalType.maintain) {
+      _targetWeight.text = _weight.text;
+    }
+    _touch();
+  }
 
   Future<void> _pickBirthDate() async {
     final now = DateTime.now();
@@ -1035,7 +1364,10 @@ class _ProfileEditorState extends State<_ProfileEditor> {
                                       if (goal == GoalType.maintain) {
                                         _targetWeight.text =
                                             ProfilePage._number(
-                                              widget.profile.weightKg,
+                                              double.tryParse(
+                                                    _weight.text.trim(),
+                                                  ) ??
+                                                  widget.profile.weightKg,
                                             );
                                       }
                                     }),
@@ -1062,12 +1394,11 @@ class _ProfileEditorState extends State<_ProfileEditor> {
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: _ReadOnlyField(
+                                child: _NumberField(
+                                  controller: _weight,
                                   label: '当前体重',
-                                  value: ProfilePage._number(
-                                    widget.profile.weightKg,
-                                  ),
                                   suffix: 'kg',
+                                  onChanged: _touchWeight,
                                 ),
                               ),
                             ],
@@ -1282,59 +1613,6 @@ class _NumberField extends StatelessWidget {
         border: border(Colors.transparent, 0),
         enabledBorder: border(Colors.transparent, 0),
         focusedBorder: border(AppColors.ink, 1.4),
-      ),
-    );
-  }
-}
-
-/// 只读的参照值（当前体重）—— 和输入框同一形状，但明显不可编辑。
-class _ReadOnlyField extends StatelessWidget {
-  const _ReadOnlyField({
-    required this.label,
-    required this.value,
-    required this.suffix,
-  });
-
-  final String label;
-  final String value;
-  final String suffix;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.field),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppFonts.text(size: 12, color: AppColors.ink3),
-          ),
-          const SizedBox(height: 6),
-          // 窄屏上数字优先缩放，不要撑破这一格。
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                NumText(value, size: 18, color: AppColors.ink2),
-                const SizedBox(width: 4),
-                Text(
-                  suffix,
-                  style: AppFonts.text(size: 12, color: AppColors.ink3),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1717,8 +1995,10 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text('取消',
-              style: AppFonts.text(size: 14, color: AppColors.ink2)),
+          child: Text(
+            '取消',
+            style: AppFonts.text(size: 14, color: AppColors.ink2),
+          ),
         ),
         TextButton(
           onPressed: ready ? () => Navigator.of(context).pop(true) : null,
@@ -1735,4 +2015,3 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
     );
   }
 }
-

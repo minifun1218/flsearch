@@ -20,7 +20,7 @@
 
 ```powershell
 flutter pub get
-flutter run --dart-define=FITMEAL_API_BASE_URL=https://easycodetech.top/api/v1
+flutter run --dart-define=FITMEAL_API_BASE_URL=
 ```
 
 `FITMEAL_API_BASE_URL` 不传时按平台猜一个开发地址：Android 模拟器 `10.0.2.2:8000`，
@@ -40,6 +40,7 @@ flutter analyze
 flutter test
 dart run tool/smoke.dart            # 对着真实服务端跑一遍主流程，需要先起服务端
 flutter build apk --debug
+flutter build apk --release --dart-define=FITMEAL_API_BASE_URL=
 ```
 
 `flutter test` 里的 widget 测试用 `DemoRepository`，不联网；`tool/smoke.dart` 是唯一
